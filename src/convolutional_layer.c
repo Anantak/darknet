@@ -321,6 +321,12 @@ void cudnn_convolutional_setup(layer *l)
 
     #else   // CUDNN_MAJOR >= 8
 
+        int cudnn_preference = 0;
+        int cudnn_fastest = 0;
+        int cudnn_smallest = 1;
+        int cudnn_specify = 2;
+        int workspace_size_specify = 4000000000;
+
         int forward_algo = CUDNN_CONVOLUTION_FWD_PREFER_FASTEST;
         int backward_algo = CUDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST;
         int backward_filter = CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST;
