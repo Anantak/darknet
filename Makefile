@@ -14,7 +14,7 @@ DEBUG=0
 ifeq ($(shell uname -p),x86_64)
 ARCH= -gencode arch=compute_61,code=sm_61
 endif
-ifeq ($(shell uname -p),arm64)
+ifeq ($(shell uname -p),aarch64)
 ARCH= -gencode arch=compute_72,code=sm_72
 endif
 
