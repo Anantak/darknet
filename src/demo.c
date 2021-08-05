@@ -38,6 +38,8 @@ static int demo_done = 0;
 static float *avg;
 double demo_time;
 
+static char boxes_out_filename[1024] = {0};
+
 void *detect_in_thread(void *ptr)
 {
     running = 1;
@@ -51,10 +53,10 @@ void *detect_in_thread(void *ptr)
     mean_arrays(predictions, demo_frame, l.outputs, avg);
     l.output = avg;
     if(l.type == DETECTION){
-        printf("l.type == DETECTION");
+        // printf("l.type == DETECTION");
         get_detection_boxes(l, 1, 1, demo_thresh, probs, boxes, 0);
     } else if (l.type == REGION){
-        printf("l.type == REGION");
+        // printf("l.type == REGION");
         get_region_boxes(l, buff[0].w, buff[0].h, net->w, net->h, demo_thresh, probs, boxes, 0, 0, 0, demo_hier, 1);
     } else {
         error("Last layer must produce detections\n");
@@ -64,9 +66,10 @@ void *detect_in_thread(void *ptr)
     //printf("\033[2J");
     //printf("\033[1;1H");
     printf("\nFPS:%.1f\n",fps);
-    printf("Objects:\n\n");
+    printf("Objects: (thresh: %.0f%%)\n", demo_thresh*100);
     image display = buff[(buff_index+2) % 3];
     draw_detections(display, demo_detections, demo_thresh, boxes, probs, 0, demo_names, demo_alphabet, demo_classes);
+    save_detections(display, demo_detections, demo_thresh, boxes, probs, 0, demo_names, demo_alphabet, demo_classes, boxes_out_filename);
 
     demo_index = (demo_index + 1)%demo_frame;
     running = 0;
@@ -175,7 +178,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, int cam_index, const ch
 
     int count = 0;
     if(!prefix){
-        cvNamedWindow("Demo", CV_WINDOW_NORMAL); 
+        cvNamedWindow("Demo", CV_WINDOW_NORMAL);
         if(fullscreen){
             cvSetWindowProperty("Demo", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
         } else {
@@ -198,6 +201,9 @@ void demo(char *cfgfile, char *weightfile, float thresh, int cam_index, const ch
             char name[256];
             sprintf(name, "%s_%08d", prefix, count);
             save_image(buff[(buff_index + 1)%3], name);
+            memset(boxes_out_filename, 0, sizeof(boxes_out_filename));
+            sprintf(boxes_out_filename, "%s_%08d.txt", prefix, count);
+            // printf("%s\n", boxes_out_filename);
         }
         pthread_join(fetch_thread, 0);
         pthread_join(detect_thread, 0);
@@ -263,7 +269,7 @@ void demo_compare(char *cfg1, char *weight1, char *cfg2, char *weight2, float th
 
     int count = 0;
     if(!prefix){
-        cvNamedWindow("Demo", CV_WINDOW_NORMAL); 
+        cvNamedWindow("Demo", CV_WINDOW_NORMAL);
         if(fullscreen){
             cvSetWindowProperty("Demo", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
         } else {
@@ -298,4 +304,3 @@ void demo(char *cfgfile, char *weightfile, float thresh, int cam_index, const ch
     fprintf(stderr, "Demo needs OpenCV for webcam images.\n");
 }
 #endif
-

@@ -572,7 +572,7 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
     char *name_list = option_find_str(options, "names", "data/names.list");
     char **names = get_labels(name_list);
 
-    printf(" OpenCV version: %d %d %d\n", CV_VERSION_EPOCH, CV_VERSION_MAJOR, CV_VERSION_MINOR); 
+    printf(" OpenCV version: %d %d %d\n", CV_VERSION_EPOCH, CV_VERSION_MAJOR, CV_VERSION_MINOR);
 
     image **alphabet = load_alphabet();
     network *net = load_network(cfgfile, weightfile, 0);
